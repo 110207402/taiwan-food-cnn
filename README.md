@@ -91,20 +91,41 @@ data/
 
 ## 4. 結果
 
-> 訓練完成後請填入下表(由 `outputs/comparison.csv` 直接搬數字)
+| Model | Params | Test Top-1 | Test Top-5 | Macro-F1 | Weighted-F1 | Best Val Top-1 | Best Epoch |
+|---|---|---|---|---|---|---|---|
+| **ConvNeXt-Tiny** | 27.8M | **96.24** | **99.30** | **95.84** | **96.08** | 96.50 | 20 |
+| ResNet-50         | 23.6M | 79.42 | 97.08 | 78.82 | 79.15 | 80.32 | 23 |
 
-| Model | Params | Test Top-1 | Test Top-5 | Macro-F1 | Weighted-F1 | Best Val Top-1 |
-|---|---|---|---|---|---|---|
-| ConvNeXt-Tiny | ~29M | TBD | TBD | TBD | TBD | TBD |
-| ResNet-50     | ~25M | TBD | TBD | TBD | TBD | TBD |
+訓練在 Colab A100 上、每模型總共 28 epochs(3 stage-1 + 25 stage-2),ConvNeXt 觸發 early stopping。
 
-**Worst classes (ConvNeXt-Tiny)**:
-- TBD
+### ConvNeXt-Tiny 最差 5 類 (by F1)
+| 類別 | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| spicy_duck_blood          | 0.824 | 0.824 | 0.824 | 17 |
+| luwei                      | 0.882 | 0.833 | 0.857 | 18 |
+| three-cup_chicken          | 0.889 | 0.941 | 0.914 | 17 |
+| kung-pao_chicken           | 0.944 | 0.895 | 0.919 | 19 |
+| grilled_taiwanese_sausage  | 1.000 | 0.857 | 0.923 | 21 |
 
-**Top confused pairs**:
-- TBD
+### ConvNeXt-Tiny Top-5 混淆對
+| Class A | Class B | A→B | B→A | Total |
+|---|---|---|---|---|
+| kung-pao_chicken | three-cup_chicken | 2 | 1 | 3 |
+| luwei            | spicy_duck_blood  | 2 | 1 | 3 |
+| grilled_taiwanese_sausage | taiwanese_sausage_in_rice_bun | 2 | 0 | 2 |
+| spicy_duck_blood | stinky_tofu       | 1 | 1 | 2 |
+| bawan            | tangyuan          | 1 | 0 | 1 |
 
-(混淆矩陣與誤判樣本圖可從 `outputs/{model}/` 取得)
+混淆都集中在視覺上真的相似的料理(兩種雞 / 兩種香腸 / 滷味與鴨血等),屬於合理的 fine-grained 殘餘錯誤。
+
+### 為什麼 ConvNeXt 比 ResNet 高 17 點?
+
+兩條曲線對照(`outputs/{model}/train_curves.png`):
+- ConvNeXt 的 frozen backbone + head-only 訓練 3 epochs 就到 **93% val**,顯示 ImageNet-1k 上學到的特徵直接對台灣美食非常具區分力
+- ResNet-50 的 head-only 階段只到 **64% val**,full fine-tune 結束時 train acc 仍低於 val(被 RandAugment 拉太用力),且 cosine LR 已歸零,屬於「還能再爬但被排程提前剎車」的狀態
+- 這證明主要差距來自 backbone 本身的預訓練特徵品質,不是訓練配方的問題
+
+完整混淆矩陣與誤判樣本圖見 `outputs/{model}/` 底下。
 
 ---
 
