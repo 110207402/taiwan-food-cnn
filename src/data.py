@@ -45,9 +45,10 @@ def build_eval_transform(img_size: int) -> transforms.Compose:
 
 
 def _load_class_mapping(csv_path: Path) -> Dict[int, str]:
-    """Read class_mapping.csv as {label_int: class_name}."""
+    """Read class_mapping.csv as {label_int: class_name}. Handles UTF-8 BOM."""
     mapping: Dict[int, str] = {}
-    with open(csv_path, "r", encoding="utf-8") as f:
+    # utf-8-sig transparently strips a BOM if present (Windows-saved CSVs often have one).
+    with open(csv_path, "r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
             mapping[int(row["label"])] = row["class_name"]
