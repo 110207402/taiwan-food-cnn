@@ -1,0 +1,39 @@
+name: resnet50
+
+model:
+  name: resnet50
+  pretrained: true
+
+data:
+  root: data
+  num_classes: 34
+  img_size: 224
+  batch_size: 64
+  num_workers: 4
+
+train:
+  seed: 42
+  stage1_epochs: 3
+  stage2_epochs: 25
+  stage1_lr_head: 1.0e-3
+  stage2_lr_head: 1.0e-4
+  stage2_lr_backbone: 1.0e-5
+  weight_decay: 1.0e-4
+  label_smoothing: 0.1
+  warmup_epochs: 3
+  early_stop_patience: 8
+  grad_clip: 1.0
+
+augment:
+  rand_augment_n: 2
+  rand_augment_m: 9
+  color_jitter: 0.2
+  rotation_degrees: 15
+  random_crop_scale: [0.6, 1.0]
+  horizontal_flip_p: 0.5
+
+eval:
+  tta_hflip: true
+
+output:
+  dir: outputs/resnet50
