@@ -118,14 +118,35 @@ data/
 
 混淆都集中在視覺上真的相似的料理(兩種雞 / 兩種香腸 / 滷味與鴨血等),屬於合理的 fine-grained 殘餘錯誤。
 
+### 訓練曲線
+
+**ConvNeXt-Tiny** — val acc 第 1 epoch 就 85%、第 3 epoch(head-only 結束)93%,曲線健康收斂於 96.5%
+![convnext train curves](docs/results/convnext_tiny/train_curves.png)
+
+**ResNet-50** — val acc 整路高於 train acc(被強 augmentation 拉開),epoch 28 仍緩慢爬升但 cosine LR 已歸零
+![resnet50 train curves](docs/results/resnet50/train_curves.png)
+
+### 混淆矩陣 (row-normalized)
+
+**ConvNeXt-Tiny** — 對角線近乎乾淨,僅少數細粒度殘餘混淆
+![convnext confusion matrix](docs/results/convnext_tiny/confusion_matrix.png)
+
+**ResNet-50** — 對角線明顯較淡,off-diagonal 散佈廣
+![resnet50 confusion matrix](docs/results/resnet50/confusion_matrix.png)
+
+### 最差 5 類的誤判樣本
+
+**ConvNeXt-Tiny** — 標題格式:`→ 預測類別 (信心值)`
+![convnext misclassified samples](docs/results/convnext_tiny/misclassified_samples.png)
+
+**ResNet-50**
+![resnet50 misclassified samples](docs/results/resnet50/misclassified_samples.png)
+
 ### 為什麼 ConvNeXt 比 ResNet 高 17 點?
 
-兩條曲線對照(`outputs/{model}/train_curves.png`):
 - ConvNeXt 的 frozen backbone + head-only 訓練 3 epochs 就到 **93% val**,顯示 ImageNet-1k 上學到的特徵直接對台灣美食非常具區分力
 - ResNet-50 的 head-only 階段只到 **64% val**,full fine-tune 結束時 train acc 仍低於 val(被 RandAugment 拉太用力),且 cosine LR 已歸零,屬於「還能再爬但被排程提前剎車」的狀態
 - 這證明主要差距來自 backbone 本身的預訓練特徵品質,不是訓練配方的問題
-
-完整混淆矩陣與誤判樣本圖見 `outputs/{model}/` 底下。
 
 ---
 
