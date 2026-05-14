@@ -152,7 +152,7 @@ data/
 
 ## 5. 如何使用
 
-### 方法 A — Colab(推薦)
+### 方法 A — Colab
 1. 把 `notebooks/colab_run.ipynb` 開到 Colab
 2. 編輯第 1 個程式碼 cell 中的 `GITHUB_URL` 為你的 repo
 3. 把整個 `台灣美食34/` 資料夾壓成 `taiwan_food34.zip`(zip 內保留 `train/`、`val/`、`test/` 與 csv)
