@@ -23,6 +23,10 @@
 
 ## 2. 資料集
 
+### 來源
+
+原始資料集為 **[Taiwanese Food 101 (Kaggle, by Kuan-Ting Lai)](https://www.kaggle.com/datasets/kuantinglai/taiwanese-food-101)**,本專案從中**篩選 34 類**較具代表性的台灣美食使用(每類以資料夾名稱作為 class name)。
+
 每張圖片屬於 34 種台灣美食之一(`bawan`、`beef_noodles`、`bubble_tea`、`xiaolongbao`、...)。
 
 | Split | Images |
@@ -32,12 +36,29 @@
 | Test  | 719 |
 | **Total** | **6,973** |
 
-- 已 stratified 切分 80 / 10 / 10,每類在各 split 都有出現
-- 訓練集每類平均約 164 張(範圍 129–286,輕度不平衡 ~2.2x)
 - 圖片解析度差異大(寬 150–2992,長寬比 0.46–2.31),訓練時統一 resize 至 224×224
+- 訓練集每類平均約 164 張(範圍 129–286,輕度不平衡 ~2.2x)
 - 格式以 `.jpg` 為主,少量 `.png` / `.jpeg`
 
-資料夾結構(zip 解壓後):
+### 資料前處理(train / val / test split)
+
+依以下比例切分,**對每一個類別分別隨機切分**,確保 train、val、test 中皆包含全部 34 個類別(stratified split):
+
+| 資料集 | 比例 |
+|---|---|
+| Train      | 80% |
+| Validation | 10% |
+| Test       | 10% |
+
+> Test set 不參與模型訓練,只用於最後評估模型表現。
+
+切分腳本見 [`split_dataset.py`](../split_dataset.py)(資料集原始檔附帶,使用 `random.seed(42)` 保證可重現),產出三個輔助 CSV:
+- `class_mapping.csv` — label 編號 ↔ 類別名稱
+- `dataset_split.csv` — 每張圖片的路徑、所屬 split、label 編號、類別名稱
+- `dataset_summary.csv` — 每個類別在 train / val / test 中的圖片數量
+
+### 資料夾結構(zip 解壓後)
+
 ```
 data/
 ├── train/<class_name>/*.jpg
@@ -48,7 +69,7 @@ data/
 └── dataset_summary.csv    # 各 split 各類張數
 ```
 
-> ⚠️ 資料本身不放入 Git。請另外 zip 上傳到 Colab(見下方使用方式)。
+> ⚠️ 資料本身不放入 Git。請從上方 Kaggle 連結下載,或將你已切分好的 `台灣美食34/` 資料夾壓成 zip 後上傳到 Colab(見下方使用方式)。
 
 ---
 
