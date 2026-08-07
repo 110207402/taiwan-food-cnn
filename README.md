@@ -52,7 +52,7 @@
 
 > Test set 不參與模型訓練,只用於最後評估模型表現。
 
-切分腳本見 [`split_dataset.py`](../split_dataset.py)(資料集原始檔附帶,使用 `random.seed(42)` 保證可重現),產出三個輔助 CSV:
+切分腳本見 [`scripts/split_dataset.py`](scripts/split_dataset.py),使用 `random.seed(42)` 保證可重現,並產出三個輔助 CSV:
 - `class_mapping.csv` — label 編號 ↔ 類別名稱
 - `dataset_split.csv` — 每張圖片的路徑、所屬 split、label 編號、類別名稱
 - `dataset_summary.csv` — 每個類別在 train / val / test 中的圖片數量
@@ -189,6 +189,9 @@ pip install -r requirements.txt
 
 # 2. 把資料放到 ./data,結構應為 data/train, data/val, data/test, data/class_mapping.csv
 
+# 若下載的是尚未切分、以類別資料夾排列的原始資料,先執行:
+python -m scripts.split_dataset --source /path/to/raw_classes --output ./data
+
 # 3. 訓練主模型
 python -m scripts.run_train --config configs/convnext_tiny.yaml
 
@@ -227,6 +230,7 @@ taiwan-food-cnn/
 ├── scripts/
 │   ├── run_train.py             # 訓練 + 評估 + 分析(主進入點)
 │   ├── run_analysis.py          # 只跑分析(checkpoint 必須已存在)
+│   ├── split_dataset.py         # 可重現的 stratified 資料切分
 │   └── compare_models.py        # 多模型結果整合
 └── notebooks/
     └── colab_run.ipynb          # Colab 一鍵跑完整流程
